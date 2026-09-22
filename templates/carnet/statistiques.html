@@ -2,9 +2,22 @@
 {% block title %}Statistiques{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto">
-    <h1 class="text-3xl font-bold text-purple-900 mb-6 animate-fade-in-up">Mes statistiques</h1>
+<div class="max-w-7xl mx-auto">
 
+    <!-- En-tête -->
+    <div class="mb-8 animate-fade-in-up">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+                <i data-lucide="bar-chart-3" class="w-6 h-6 text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold text-purple-900">Mes statistiques</h1>
+                <p class="text-slate-500">Vue d'ensemble de votre activité</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPIs -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         <div class="glass rounded-2xl p-6 animate-fade-in-up">
             <div class="flex items-center justify-between mb-3">
@@ -35,5 +48,220 @@
             <p class="text-slate-600 text-sm">Clients favoris</p>
         </div>
     </div>
+
+    <!-- Grille des graphiques -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+        <!-- Répartition par sexe -->
+        <div class="glass rounded-2xl p-6 animate-fade-in-up">
+            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i data-lucide="users" class="w-5 h-5 text-purple-500"></i>
+                Répartition par sexe
+            </h2>
+            <div class="h-64">
+                <canvas id="chart-sexe"></canvas>
+            </div>
+        </div>
+
+        <!-- RDV par statut -->
+        <div class="glass rounded-2xl p-6 animate-fade-in-up" style="animation-delay: 0.1s">
+            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i data-lucide="calendar-clock" class="w-5 h-5 text-blue-500"></i>
+                RDV par statut
+            </h2>
+            <div class="h-64">
+                <canvas id="chart-rdv"></canvas>
+            </div>
+        </div>
+
+        <!-- Signes astrologiques -->
+        <div class="glass rounded-2xl p-6 animate-fade-in-up" style="animation-delay: 0.2s">
+            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i data-lucide="star" class="w-5 h-5 text-purple-500"></i>
+                Signes astrologiques
+            </h2>
+            <div class="h-80">
+                <canvas id="chart-signes"></canvas>
+            </div>
+        </div>
+
+        <!-- Forfaits -->
+        <div class="glass rounded-2xl p-6 animate-fade-in-up" style="animation-delay: 0.3s">
+            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i data-lucide="gem" class="w-5 h-5 text-amber-500"></i>
+                Répartition par forfait
+            </h2>
+            <div class="h-80">
+                <canvas id="chart-forfaits"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Consultations par mois -->
+    <div class="glass rounded-2xl p-6 animate-fade-in-up" style="animation-delay: 0.4s">
+        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <i data-lucide="trending-up" class="w-5 h-5 text-green-500"></i>
+            Consultations (6 derniers mois)
+        </h2>
+        <div class="h-72">
+            <canvas id="chart-mois"></canvas>
+        </div>
+    </div>
+
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Couleurs globales
+const colors = {
+    purple: '#8b5cf6',
+    pink: '#ec4899',
+    blue: '#3b82f6',
+    green: '#10b981',
+    orange: '#f59e0b',
+    yellow: '#eab308',
+    red: '#ef4444',
+    gray: '#94a3b8'
+};
+
+// ---------- Graphique SEXE (doughnut) ----------
+new Chart(document.getElementById('chart-sexe'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Hommes', 'Femmes', 'Autres', 'Non renseigné'],
+        datasets: [{
+            data: [
+                {{ repartition_sexe.Hommes }},
+                {{ repartition_sexe.Femmes }},
+                {{ repartition_sexe.Autres }},
+                {{ repartition_sexe.Non_renseigne }}
+            ],
+            backgroundColor: [colors.blue, colors.pink, colors.purple, colors.gray],
+            borderWidth: 0,
+            hoverOffset: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'bottom', labels: { padding: 15, font: { size: 13 } } }
+        },
+        cutout: '60%'
+    }
+});
+
+// ---------- Graphique RDV par statut (bar) ----------
+new Chart(document.getElementById('chart-rdv'), {
+    type: 'bar',
+    data: {
+        labels: ['Planifiés', 'Confirmés', 'Terminés', 'Reportés', 'Annulés'],
+        datasets: [{
+            label: 'Nombre',
+            data: [
+                {{ rdv_par_statut.Planifies }},
+                {{ rdv_par_statut.Confirmes }},
+                {{ rdv_par_statut.Termines }},
+                {{ rdv_par_statut.Reportes }},
+                {{ rdv_par_statut.Annules }}
+            ],
+            backgroundColor: [colors.blue, colors.purple, colors.green, colors.orange, colors.red],
+            borderRadius: 8,
+            borderSkipped: false
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+        }
+    }
+});
+
+// ---------- Graphique SIGNES (bar horizontal) ----------
+const signesLabels = [{% for s, c in signes_data.items %}'{{ s }}',{% endfor %}];
+const signesValues = [{% for s, c in signes_data.items %}{{ c }},{% endfor %}];
+
+new Chart(document.getElementById('chart-signes'), {
+    type: 'bar',
+    data: {
+        labels: signesLabels.length ? signesLabels : ['Aucune donnée'],
+        datasets: [{
+            label: 'Clients',
+            data: signesValues.length ? signesValues : [0],
+            backgroundColor: colors.purple,
+            borderRadius: 6
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { beginAtZero: true, ticks: { stepSize: 1 } }
+        }
+    }
+});
+
+// ---------- Graphique FORFAITS (doughnut) ----------
+const forfaitsLabels = [{% for f, c in forfaits_data.items %}'{{ f }}',{% endfor %}];
+const forfaitsValues = [{% for f, c in forfaits_data.items %}{{ c }},{% endfor %}];
+
+new Chart(document.getElementById('chart-forfaits'), {
+    type: 'doughnut',
+    data: {
+        labels: forfaitsLabels.length ? forfaitsLabels : ['Aucun forfait'],
+        datasets: [{
+            data: forfaitsValues.length ? forfaitsValues : [0],
+            backgroundColor: [colors.orange, colors.yellow, colors.purple, colors.pink, colors.blue, colors.green],
+            borderWidth: 0,
+            hoverOffset: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'bottom', labels: { padding: 12, font: { size: 12 } } }
+        },
+        cutout: '60%'
+    }
+});
+
+// ---------- Graphique CONSULTATIONS PAR MOIS (line) ----------
+const moisLabels = [{% for l in mois_labels %}'{{ l }}',{% endfor %}];
+const moisValues = [{% for v in mois_values %}{{ v }},{% endfor %}];
+
+new Chart(document.getElementById('chart-mois'), {
+    type: 'line',
+    data: {
+        labels: moisLabels.length ? moisLabels : ['Aucune donnée'],
+        datasets: [{
+            label: 'Consultations',
+            data: moisValues.length ? moisValues : [0],
+            borderColor: colors.green,
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: colors.green,
+            pointBorderColor: 'white',
+            pointBorderWidth: 3,
+            pointRadius: 6,
+            pointHoverRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+        }
+    }
+});
+</script>
 {% endblock %}

@@ -211,11 +211,65 @@ def statistiques(request):
     total_rdv = RendezVous.objects.filter(fiche__voyant=request.user).count()
     fiches_favorites = fiches.filter(favori=True).count()
     
+    # Répartition par sexe
+    repartition_sexe = {
+        'Hommes': fiches.filter(sexe='M').count(),
+        'Femmes': fiches.filter(sexe='F').count(),
+        'Autres': fiches.filter(sexe='A').count(),
+        'Non_renseigne': fiches.filter(sexe='').count(),
+    }
+    
+    # Répartition par signe astrologique
+    signes_data = {}
+    for fiche in fiches.exclude(signe_astrologique=''):
+        signes_data[fiche.signe_astrologique] = signes_data.get(fiche.signe_astrologique, 0) + 1
+    
+    # Répartition par forfait
+    forfaits_data = {}
+    for fiche in fiches.exclude(forfait=''):
+        label = fiche.forfait_label
+        forfaits_data[label] = forfaits_data.get(label, 0) + 1
+    
+    # Statistiques RDV - COMPTAGE DIRECT PAR STATUT
+    rdv_par_statut = {
+        'Planifies': RendezVous.objects.filter(fiche__voyant=request.user, statut='planifie').count(),
+        'Confirmes': RendezVous.objects.filter(fiche__voyant=request.user, statut='confirme').count(),
+        'Termines': RendezVous.objects.filter(fiche__voyant=request.user, statut='termine').count(),
+        'Reportes': RendezVous.objects.filter(fiche__voyant=request.user, statut='reporte').count(),
+        'Annules': RendezVous.objects.filter(fiche__voyant=request.user, statut='annule').count(),
+    }
+    
+    # Consultations par mois (6 derniers mois)
+    from datetime import date, timedelta
+    from django.db.models.functions import TruncMonth
+    six_mois = date.today() - timedelta(days=180)
+    consultations_par_mois = (
+        HistoriqueConsultation.objects
+        .filter(fiche__voyant=request.user, date_consultation__gte=six_mois)
+        .annotate(mois=TruncMonth('date_consultation'))
+        .values('mois')
+        .annotate(total=Count('id'))
+        .order_by('mois')
+    )
+    mois_labels = []
+    mois_values = []
+    mois_fr = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc']
+    for item in consultations_par_mois:
+        if item['mois']:
+            mois_labels.append(f"{mois_fr[item['mois'].month - 1]} {item['mois'].year}")
+            mois_values.append(item['total'])
+    
     context = {
         'total_fiches': total_fiches,
         'total_historiques': total_historiques,
         'total_rdv': total_rdv,
         'fiches_favorites': fiches_favorites,
+        'repartition_sexe': repartition_sexe,
+        'signes_data': signes_data,
+        'forfaits_data': forfaits_data,
+        'rdv_par_statut': rdv_par_statut,
+        'mois_labels': mois_labels,
+        'mois_values': mois_values,
     }
     return render(request, 'carnet/statistiques.html', context)
 

@@ -168,6 +168,18 @@ class FicheClient(models.Model):
     @property
     def nom_complet(self):
         return f"{self.prenom} {self.nom}".strip() or self.nom
+
+    @property
+    def couleur_sexe(self):
+        """Retourne la couleur selon le sexe du client."""
+        if self.sexe == 'M':
+            return '#3b82f6'   # Bleu - Masculin
+        elif self.sexe == 'F':
+            return '#ec4899'   # Rose - Féminin
+        elif self.sexe == 'A':
+            return '#8b5cf6'   # Violet - Autre
+        else:
+            return self.couleur or '#7c3aed'  # Couleur par défaut
     
     @property
     def age(self):
