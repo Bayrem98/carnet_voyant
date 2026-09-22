@@ -37,15 +37,11 @@
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1.5">
-                        Nom du client *
-                    </label>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Nom du client *</label>
                     {{ form.nom }}
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1.5">
-                        Sexe
-                    </label>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Sexe</label>
                     {{ form.sexe }}
                 </div>
             </div>
@@ -57,19 +53,44 @@
                 <i data-lucide="star" class="w-5 h-5 text-purple-500"></i>
                 Naissance & signe astrologique
             </h2>
-            <div>
-                <label class="block text-sm font-medium text-slate-600 mb-1.5">
-                    Date de naissance
-                </label>
-                {{ form.date_naissance }}
-                {% if fiche.signe_astrologique %}
-                <p class="text-xs text-purple-600 mt-1">
-                    Actuellement : <strong>{{ fiche.signe_astrologique }}</strong>
-                    · Chemin de vie {{ fiche.chemin_de_vie }}
-                    · Année perso. {{ fiche.annee_personnelle }}
-                    · Chiffre clé {{ fiche.chiffre_cle }}
-                </p>
-                {% endif %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Date de naissance</label>
+                    {{ form.date_naissance }}
+                    {% if fiche.signe_astrologique %}
+                    <p class="text-xs text-purple-600 mt-1">
+                        Actuellement : <strong>{{ fiche.signe_astrologique }}</strong>
+                        · Chemin de vie {{ fiche.chemin_de_vie }}
+                        · Année perso. {{ fiche.annee_personnelle }}
+                    </p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Lieu de naissance</label>
+                    {{ form.lieu_naissance }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Informations personnelles -->
+        <div>
+            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i data-lucide="info" class="w-5 h-5 text-purple-500"></i>
+                Informations personnelles
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Situation familiale</label>
+                    {{ form.situation_familiale }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Profession</label>
+                    {{ form.profession }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Nombre d'enfants</label>
+                    {{ form.nombre_enfants }}
+                </div>
             </div>
         </div>
 
@@ -81,16 +102,12 @@
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1.5">
-                        Forfait
-                    </label>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Forfait choisi</label>
                     {{ form.forfait }}
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1.5">
-                        Montant (€)
-                    </label>
-                    {{ form.forfait_montant }}
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Minutes déjà utilisées</label>
+                    {{ form.forfait_minutes_utilisees }}
                 </div>
             </div>
         </div>

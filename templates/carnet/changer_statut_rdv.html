@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Mettre à jour le RDV{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto animate-fade-in-up">
+    <div class="mb-6">
+        <a href="{% url 'carnet:detail_fiche' rdv.fiche.pk %}" 
+           class="text-sm text-slate-500 hover:text-purple-600 flex items-center gap-1 mb-3">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            Retour à la fiche
+        </a>
+        <h1 class="text-3xl font-bold text-purple-900">Mettre à jour le RDV</h1>
+        <p class="text-slate-500">
+            {{ rdv.fiche.nom_complet }} · {{ rdv.date_rdv|date:"d/m/Y" }} à {{ rdv.heure_rdv|time:"H:i" }}
+        </p>
+    </div>
+
+    <form method="post" class="glass rounded-3xl p-6 space-y-5">
+        {% csrf_token %}
+
+        <div class="p-4 rounded-xl bg-blue-50 border border-blue-100 text-blue-800 text-sm">
+            <p class="flex items-start gap-2">
+                <i data-lucide="info" class="w-4 h-4 mt-0.5 shrink-0"></i>
+                <span>
+                    Ce rendez-vous est passé. Sélectionnez son nouveau statut pour clôturer.
+                </span>
+            </p>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-slate-600 mb-1.5">
+                Nouveau statut
+            </label>
+            {{ form.statut }}
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-slate-600 mb-1.5">
+                Notes (optionnel)
+            </label>
+            {{ form.notes }}
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+            <a href="{% url 'carnet:detail_fiche' rdv.fiche.pk %}" class="btn btn-ghost">Annuler</a>
+            <button type="submit" class="btn btn-primary">
+                <i data-lucide="check" class="w-5 h-5"></i>
+                Enregistrer le statut
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

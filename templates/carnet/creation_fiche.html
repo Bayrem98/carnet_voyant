@@ -37,15 +37,11 @@
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1.5">
-                        Nom du client *
-                    </label>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Nom du client *</label>
                     {{ form.nom }}
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1.5">
-                        Sexe
-                    </label>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Sexe</label>
                     {{ form.sexe }}
                 </div>
             </div>
@@ -57,14 +53,40 @@
                 <i data-lucide="star" class="w-5 h-5 text-purple-500"></i>
                 Naissance & signe astrologique
             </h2>
-            <div>
-                <label class="block text-sm font-medium text-slate-600 mb-1.5">
-                    Date de naissance
-                </label>
-                {{ form.date_naissance }}
-                <p class="text-xs text-purple-500 mt-1">
-                    ✨ Le signe astrologique, le chemin de vie, l'année personnelle et le chiffre clé seront calculés automatiquement
-                </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Date de naissance</label>
+                    {{ form.date_naissance }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Lieu de naissance</label>
+                    {{ form.lieu_naissance }}
+                </div>
+            </div>
+            <p class="text-xs text-purple-500 mt-1">
+                ✨ Le signe astrologique et la numérologie seront calculés automatiquement
+            </p>
+        </div>
+
+        <!-- Informations personnelles -->
+        <div>
+            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i data-lucide="info" class="w-5 h-5 text-purple-500"></i>
+                Informations personnelles
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Situation familiale</label>
+                    {{ form.situation_familiale }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Profession</label>
+                    {{ form.profession }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Nombre d'enfants</label>
+                    {{ form.nombre_enfants }}
+                </div>
             </div>
         </div>
 
@@ -76,16 +98,12 @@
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1.5">
-                        Forfait
-                    </label>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Forfait choisi</label>
                     {{ form.forfait }}
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1.5">
-                        Montant (€)
-                    </label>
-                    {{ form.forfait_montant }}
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Minutes déjà utilisées</label>
+                    {{ form.forfait_minutes_utilisees }}
                 </div>
             </div>
         </div>

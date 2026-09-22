@@ -6,7 +6,12 @@ from django.http import JsonResponse
 from django.utils import timezone
 from datetime import timedelta, date
 from .models import FicheClient, HistoriqueConsultation, RendezVous
-from .forms import FicheClientForm, HistoriqueConsultationForm, RendezVousForm
+from .forms import (
+    FicheClientForm, 
+    HistoriqueConsultationForm, 
+    RendezVousForm,
+    RendezVousStatutForm,
+)
 
 
 @login_required
@@ -82,13 +87,15 @@ def detail_fiche(request, pk):
     
     form_hist = HistoriqueConsultationForm()
     form_rdv = RendezVousForm(initial={'date_rdv': date.today()})
+    form_statut = RendezVousStatutForm()
     
     context = {
-        'fiche': fiche,
-        'historiques': historiques,
-        'rendezvous': rendezvous,
-        'form_hist': form_hist,
-        'form_rdv': form_rdv,
+    'fiche': fiche,
+    'historiques': historiques,
+    'rendezvous': rendezvous,
+    'form_hist': form_hist,
+    'form_rdv': form_rdv,
+    'form_statut': form_statut,
     }
     return render(request, 'carnet/detail_fiche.html', context)
 
@@ -211,3 +218,30 @@ def statistiques(request):
         'fiches_favorites': fiches_favorites,
     }
     return render(request, 'carnet/statistiques.html', context)
+
+@login_required
+def changer_statut_rdv(request, pk):
+    """Change le statut d'un RDV après qu'il soit passé."""
+    rdv = get_object_or_404(
+        RendezVous, 
+        pk=pk, 
+        fiche__voyant=request.user
+    )
+    
+    if not rdv.est_passe:
+        messages.error(request, "Ce rendez-vous n'est pas encore passé.")
+        return redirect('carnet:detail_fiche', pk=rdv.fiche.pk)
+    
+    if request.method == 'POST':
+        form = RendezVousStatutForm(request.POST, instance=rdv)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Statut du RDV mis à jour : {rdv.get_statut_display()}")
+            return redirect('carnet:detail_fiche', pk=rdv.fiche.pk)
+    else:
+        form = RendezVousStatutForm(instance=rdv)
+    
+    return render(request, 'carnet/changer_statut_rdv.html', {
+        'rdv': rdv,
+        'form': form,
+    })
