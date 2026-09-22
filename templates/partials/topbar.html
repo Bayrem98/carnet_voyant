@@ -1,0 +1,13 @@
+<header class="bg-white/80 backdrop-blur border-b border-purple-100 px-6 py-4 flex items-center justify-between">
+    <div>
+        <h1 class="text-xl font-bold text-purple-900">{% block page_title %}{% endblock %}</h1>
+        <p class="text-sm text-slate-500">{% block page_subtitle %}{% endblock %}</p>
+    </div>
+    
+    <div class="flex items-center gap-4">
+        <span class="flex items-center gap-2 text-sm text-slate-600">
+            <span class="w-2 h-2 rounded-full bg-green-500 statut-disponible"></span>
+            En ligne
+        </span>
+    </div>
+</header>

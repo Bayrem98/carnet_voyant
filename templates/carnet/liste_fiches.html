@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes fiches{% endblock %}
+
+{% block content %}
+<div class="mb-8 animate-fade-in-up">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-purple-900 mb-1">Mes fiches clients</h1>
+            <p class="text-slate-500">{{ total }} fiche{{ total|pluralize }} dans votre carnet</p>
+        </div>
+        <a href="{% url 'carnet:creation_fiche' %}" class="btn btn-primary">
+            <i data-lucide="plus" class="w-5 h-5"></i>
+            Nouvelle fiche
+        </a>
+    </div>
+    
+    <!-- Barre de recherche FIXÉE -->
+    <div class="glass rounded-2xl p-4">
+        <form method="get" action="{% url 'carnet:liste_fiches' %}" class="flex flex-wrap gap-3">
+            <div class="flex-1 min-w-[240px] relative">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+                <input type="text" 
+                       name="q" 
+                       value="{{ q }}"
+                       id="search-input"
+                       placeholder="Rechercher un client (nom, téléphone, mot-clé...)"
+                       class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-200 outline-none transition"
+                       autocomplete="off">
+            </div>
+            
+            <button type="submit" class="btn btn-primary">
+                <i data-lucide="search" class="w-4 h-4"></i>
+                Rechercher
+            </button>
+            
+            <a href="?favori=1" class="btn btn-ghost">
+                <i data-lucide="star" class="w-4 h-4"></i>
+                Favoris
+            </a>
+            
+            <a href="?tri=nom" class="btn btn-ghost">
+                <i data-lucide="arrow-down-a-z" class="w-4 h-4"></i>
+                A-Z
+            </a>
+            
+            <a href="{% url 'carnet:liste_fiches' %}" class="btn btn-ghost">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                Reset
+            </a>
+        </form>
+    </div>
+</div>
+
+<!-- Grille des fiches -->
+<div id="resultats-recherche">
+    {% include 'carnet/partials/grille_fiches.html' with fiches=fiches %}
+</div>
+
+<script>
+// Recherche instantanée au fur et à mesure de la frappe (optionnel)
+let debounceTimer;
+document.getElementById('search-input').addEventListener('input', function(e) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+        const q = e.target.value;
+        fetch(`{% url 'carnet:recherche_ajax' %}?q=${encodeURIComponent(q)}`)
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('resultats-recherche').innerHTML = html;
+                lucide.createIcons();
+            });
+    }, 300);
+});
+</script>
+{% endblock %}

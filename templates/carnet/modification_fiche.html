@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier {{ fiche.nom_complet }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto animate-fade-in-up">
+    <div class="mb-6">
+        <a href="{% url 'carnet:detail_fiche' fiche.pk %}" class="text-sm text-slate-500 hover:text-purple-600 flex items-center gap-1 mb-3">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            Retour à la fiche
+        </a>
+        <h1 class="text-3xl font-bold text-purple-900">Modifier la fiche</h1>
+        <p class="text-slate-500">{{ fiche.nom_complet }}</p>
+    </div>
+
+    <form method="post" class="glass rounded-3xl p-6 space-y-6">
+        {% csrf_token %}
+
+        {% if form.errors %}
+        <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+            <strong>Erreurs :</strong>
+            <ul class="list-disc ml-5 mt-1">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                    <li>{{ field }} : {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Identité -->
+        <div>
+            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i data-lucide="user" class="w-5 h-5 text-purple-500"></i>
+                Identité
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">
+                        Nom du client *
+                    </label>
+                    {{ form.nom }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">
+                        Sexe
+                    </label>
+                    {{ form.sexe }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Naissance -->
+        <div>
+            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i data-lucide="star" class="w-5 h-5 text-purple-500"></i>
+                Naissance & signe astrologique
+            </h2>
+            <div>
+                <label class="block text-sm font-medium text-slate-600 mb-1.5">
+                    Date de naissance
+                </label>
+                {{ form.date_naissance }}
+                {% if fiche.signe_astrologique %}
+                <p class="text-xs text-purple-600 mt-1">
+                    Actuellement : <strong>{{ fiche.signe_astrologique }}</strong>
+                    · Chemin de vie {{ fiche.chemin_de_vie }}
+                    · Année perso. {{ fiche.annee_personnelle }}
+                    · Chiffre clé {{ fiche.chiffre_cle }}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Forfait -->
+        <div>
+            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i data-lucide="gem" class="w-5 h-5 text-amber-500"></i>
+                Forfait
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">
+                        Forfait
+                    </label>
+                    {{ form.forfait }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">
+                        Montant (€)
+                    </label>
+                    {{ form.forfait_montant }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i data-lucide="book-marked" class="w-5 h-5 text-purple-500"></i>
+                Votre histoire du client
+            </h2>
+            {{ form.description_generale }}
+        </div>
+
+        <div class="flex items-center justify-between pt-4 border-t border-slate-200">
+            <a href="{% url 'carnet:suppression_fiche' fiche.pk %}"
+               class="btn btn-ghost text-red-500 hover:bg-red-50">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                Supprimer la fiche
+            </a>
+            <div class="flex items-center gap-3">
+                <a href="{% url 'carnet:detail_fiche' fiche.pk %}" class="btn btn-ghost">Annuler</a>
+                <button type="submit" class="btn btn-primary">
+                    <i data-lucide="save" class="w-5 h-5"></i>
+                    Enregistrer
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

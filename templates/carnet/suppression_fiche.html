@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer {{ fiche.nom_complet }}{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto animate-fade-in-up">
+    <div class="glass rounded-3xl p-8 text-center">
+        
+        <!-- Icône d'avertissement animée -->
+        <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-red-100 flex items-center justify-center animate-float">
+            <i data-lucide="alert-triangle" class="w-10 h-10 text-red-500"></i>
+        </div>
+        
+        <h1 class="text-2xl font-bold text-slate-800 mb-3">
+            Supprimer cette fiche ?
+        </h1>
+        
+        <p class="text-slate-600 mb-2">
+            Vous êtes sur le point de supprimer définitivement la fiche de :
+        </p>
+        
+        <!-- Carte de la fiche -->
+        <div class="my-6 p-4 rounded-2xl border border-slate-200 bg-white flex items-center gap-4">
+            <div class="w-14 h-14 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg"
+                 style="background: linear-gradient(135deg, {{ fiche.couleur }}, {{ fiche.couleur }}cc);">
+                {{ fiche.nom|first|upper }}
+            </div>
+            <div class="text-left flex-1">
+                <div class="font-bold text-slate-800">{{ fiche.nom_complet }}</div>
+                {% if fiche.telephone %}
+                <div class="text-sm text-slate-500 flex items-center gap-1">
+                    <i data-lucide="phone" class="w-3 h-3"></i>
+                    {{ fiche.telephone }}
+                </div>
+                {% endif %}
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-slate-400">Notes</div>
+                <div class="font-bold text-purple-600">{{ fiche.evenements.count }}</div>
+            </div>
+        </div>
+        
+        <!-- Avertissement -->
+        <div class="p-4 rounded-xl bg-red-50 border border-red-100 mb-6 text-left">
+            <p class="text-sm text-red-700 flex items-start gap-2">
+                <i data-lucide="info" class="w-4 h-4 mt-0.5 shrink-0"></i>
+                <span>
+                    <strong>Attention :</strong> cette action est irréversible. 
+                    Toutes les notes, événements et prédictions liés à cette fiche seront également supprimés.
+                </span>
+            </p>
+        </div>
+        
+        <!-- Actions -->
+        <form method="post" class="flex items-center justify-center gap-3">
+            {% csrf_token %}
+            <a href="{% url 'carnet:detail_fiche' fiche.pk %}" class="btn btn-ghost">
+                <i data-lucide="x" class="w-4 h-4"></i>
+                Annuler
+            </a>
+            <button type="submit" 
+                    class="btn bg-red-500 text-white hover:bg-red-600 hover:-translate-y-0.5 shadow-lg shadow-red-200 transition-all">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                Oui, supprimer définitivement
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

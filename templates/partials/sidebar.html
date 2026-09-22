@@ -1,0 +1,61 @@
+<aside class="w-64 bg-white border-r border-purple-100 flex flex-col">
+    <!-- Logo -->
+    <div class="p-6 border-b border-purple-100">
+        <a href="{% url 'carnet:liste_fiches' %}" class="flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-500 flex items-center justify-center shadow-lg group-hover:scale-105 transition">
+                <i data-lucide="book-open" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+                <div class="font-bold text-lg text-purple-900">Mon Carnet</div>
+                <div class="text-xs text-slate-500">Voyance & Notes</div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="flex-1 p-4 space-y-1">
+        <a href="{% url 'carnet:liste_fiches' %}" 
+           class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 group">
+            <i data-lucide="book" class="w-5 h-5 group-hover:scale-110 transition"></i>
+            <span class="font-medium">Mes fiches</span>
+        </a>
+        
+        <a href="{% url 'carnet:creation_fiche' %}" 
+           class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 group">
+            <i data-lucide="plus-circle" class="w-5 h-5 group-hover:scale-110 transition"></i>
+            <span class="font-medium">Nouvelle fiche</span>
+        </a>
+        
+        <a href="{% url 'carnet:rappels' %}" 
+           class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 group">
+            <i data-lucide="bell" class="w-5 h-5 group-hover:scale-110 transition"></i>
+            <span class="font-medium">Rappels</span>
+        </a>
+        
+        <a href="{% url 'carnet:statistiques' %}" 
+           class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 group">
+            <i data-lucide="bar-chart-3" class="w-5 h-5 group-hover:scale-110 transition"></i>
+            <span class="font-medium">Statistiques</span>
+        </a>
+    </nav>
+    
+    <!-- Profil -->
+    <div class="p-4 border-t border-purple-100">
+        <div class="flex items-center gap-3 p-3 rounded-xl bg-purple-50">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
+                {{ user.username|first|upper }}
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="font-medium text-sm text-purple-900 truncate">
+                    {{ user.get_full_name|default:user.username }}
+                </div>
+                <div class="text-xs text-slate-500">
+                    {{ user.get_role_display }}
+                </div>
+            </div>
+            <a href="{% url 'accounts:logout' %}" class="text-slate-400 hover:text-red-500 transition">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
+            </a>
+        </div>
+    </div>
+</aside>

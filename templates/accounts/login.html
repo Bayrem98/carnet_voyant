@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block auth_content %}
+<div class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    
+    <!-- Fond étoilé -->
+    <div class="absolute inset-0 bg-gradient-to-br from-purple-900 via-indigo-900 to-pink-900"></div>
+    <div class="absolute inset-0 opacity-40" id="stars"></div>
+    
+    <!-- Carte login -->
+    <div class="relative w-full max-w-md">
+        <div class="glass rounded-3xl p-8 shadow-2xl animate-fade-in-up">
+            
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg animate-float">
+                    <i data-lucide="sparkles" class="w-8 h-8 text-white"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2">Mon Carnet</h1>
+                <p class="text-purple-200">Votre espace personnel de notes</p>
+            </div>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-3 rounded-lg bg-red-500/20 border border-red-400/30 text-red-100 text-sm">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="post" class="space-y-5">
+                {% csrf_token %}
+                
+                <div>
+                    <label class="block text-sm font-medium text-purple-100 mb-2">Nom d'utilisateur</label>
+                    <div class="relative">
+                        <i data-lucide="user" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300"></i>
+                        <input type="text" name="username" required autofocus
+                               class="w-full pl-11 pr-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-purple-100 mb-2">Mot de passe</label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300"></i>
+                        <input type="password" name="password" required
+                               class="w-full pl-11 pr-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-full justify-center text-base py-3">
+                    <i data-lucide="log-in" class="w-5 h-5"></i>
+                    Se connecter
+                </button>
+            </form>
+        </div>
+        
+        <p class="text-center text-purple-300/60 text-sm mt-6">
+            Application réservée aux voyants et responsables
+        </p>
+    </div>
+</div>
+
+<script>
+    // Générer des étoiles
+    const stars = document.getElementById('stars');
+    for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.className = 'absolute rounded-full bg-white';
+        star.style.width = star.style.height = Math.random() * 2 + 'px';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.opacity = Math.random() * 0.7 + 0.3;
+        star.style.animation = `float ${2 + Math.random() * 3}s ease-in-out infinite`;
+        star.style.animationDelay = Math.random() * 2 + 's';
+        stars.appendChild(star);
+    }
+</script>
+{% endblock %}
