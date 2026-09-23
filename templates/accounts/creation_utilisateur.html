@@ -2,7 +2,7 @@
 {% block title %}Nouvel utilisateur{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto animate-fade-in-up">
+<div class="max-w-xl mx-auto animate-fade-in-up">
     <div class="mb-6">
         <a href="{% url 'accounts:gestion_utilisateurs' %}" class="text-sm text-slate-500 hover:text-purple-600 flex items-center gap-1 mb-3">
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
@@ -20,45 +20,50 @@
             <strong>Erreurs :</strong>
             <ul class="list-disc ml-5 mt-1">
                 {% for field, errors in form.errors.items %}
-                    {% for error in errors %}<li>{{ field }} : {{ error }}</li>{% endfor %}
+                    {% for error in errors %}<li>{{ error }}</li>{% endfor %}
                 {% endfor %}
             </ul>
         </div>
         {% endif %}
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-slate-600 mb-1.5">Nom d'utilisateur *</label>
-                {{ form.username }}
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-600 mb-1.5">Rôle *</label>
-                {{ form.role }}
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-600 mb-1.5">Prénom</label>
-                {{ form.first_name }}
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-600 mb-1.5">Nom</label>
-                {{ form.last_name }}
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-600 mb-1.5">Email</label>
-                {{ form.email }}
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-600 mb-1.5">Téléphone pro</label>
-                {{ form.telephone_pro }}
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-600 mb-1.5">Mot de passe *</label>
-                {{ form.password1 }}
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-600 mb-1.5">Confirmer *</label>
-                {{ form.password2 }}
-            </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-600 mb-1.5">
+                Nom d'utilisateur *
+            </label>
+            {{ form.username }}
+            <p class="text-xs text-slate-400 mt-1">
+                Lettres, chiffres et @/./+/-/_ uniquement
+            </p>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-slate-600 mb-1.5">
+                Rôle *
+            </label>
+            {{ form.role }}
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-slate-600 mb-1.5">
+                Mot de passe *
+            </label>
+            {{ form.password1 }}
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-slate-600 mb-1.5">
+                Confirmer le mot de passe *
+            </label>
+            {{ form.password2 }}
+        </div>
+
+        <div class="p-3 rounded-xl bg-purple-50 border border-purple-100">
+            <p class="text-xs text-purple-700 flex items-start gap-2">
+                <i data-lucide="info" class="w-4 h-4 shrink-0 mt-0.5"></i>
+                <span>
+                    Le mot de passe doit contenir au moins 8 caractères, ne pas être trop simple et ne pas être similaire au nom d'utilisateur.
+                </span>
+            </p>
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">

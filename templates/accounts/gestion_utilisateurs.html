@@ -80,19 +80,22 @@
                 {% for u in users %}
                 <tr class="border-b border-slate-100 hover:bg-purple-50/50 transition">
                     <td class="px-5 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold
-                                {% if u.role == 'admin' %}bg-gradient-to-br from-red-500 to-orange-500
-                                {% elif u.role == 'responsable' %}bg-gradient-to-br from-blue-500 to-cyan-500
-                                {% else %}bg-gradient-to-br from-purple-500 to-pink-500{% endif %}">
-                                {{ u.username|first|upper }}
-                            </div>
-                            <div>
-                                <div class="font-semibold text-slate-800">{{ u.nom_complet }}</div>
-                                <div class="text-xs text-slate-500">@{{ u.username }}</div>
-                            </div>
-                        </div>
-                    </td>
+    <a href="{% url 'accounts:detail_utilisateur' u.pk %}" 
+       class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold
+            {% if u.role == 'admin' %}bg-gradient-to-br from-red-500 to-orange-500
+            {% elif u.role == 'responsable' %}bg-gradient-to-br from-blue-500 to-cyan-500
+            {% else %}bg-gradient-to-br from-purple-500 to-pink-500{% endif %}">
+            {{ u.username|first|upper }}
+        </div>
+        <div>
+            <div class="font-semibold text-slate-800 group-hover:text-purple-600 transition">
+                {{ u.nom_complet }}
+            </div>
+            <div class="text-xs text-slate-500">@{{ u.username }}</div>
+        </div>
+    </a>
+</td>
                     <td class="px-5 py-4">
                         {% if u.role == 'admin' %}
                         <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">🛡️ Admin</span>
@@ -114,24 +117,28 @@
                         {% endif %}
                     </td>
                     <td class="px-5 py-4 text-right">
-                        <div class="flex items-center justify-end gap-1">
-                            <a href="{% url 'accounts:modification_utilisateur' u.pk %}"
-                               class="p-2 rounded-lg hover:bg-purple-100 text-purple-600 transition" title="Modifier">
-                                <i data-lucide="edit" class="w-4 h-4"></i>
-                            </a>
-                            {% if u != request.user %}
-                            <a href="{% url 'accounts:toggle_actif_utilisateur' u.pk %}"
-                               class="p-2 rounded-lg hover:bg-orange-100 text-orange-600 transition"
-                               title="{% if u.actif %}Désactiver{% else %}Activer{% endif %}">
-                                <i data-lucide="{% if u.actif %}user-x{% else %}user-check{% endif %}" class="w-4 h-4"></i>
-                            </a>
-                            <a href="{% url 'accounts:suppression_utilisateur' u.pk %}"
-                               class="p-2 rounded-lg hover:bg-red-100 text-red-600 transition" title="Supprimer">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </a>
-                            {% endif %}
-                        </div>
-                    </td>
+    <div class="flex items-center justify-end gap-1">
+        <a href="{% url 'accounts:detail_utilisateur' u.pk %}"
+           class="p-2 rounded-lg hover:bg-blue-100 text-blue-600 transition" title="Voir les détails">
+            <i data-lucide="eye" class="w-4 h-4"></i>
+        </a>
+        <a href="{% url 'accounts:modification_utilisateur' u.pk %}"
+           class="p-2 rounded-lg hover:bg-purple-100 text-purple-600 transition" title="Modifier">
+            <i data-lucide="edit" class="w-4 h-4"></i>
+        </a>
+        {% if u != request.user %}
+        <a href="{% url 'accounts:toggle_actif_utilisateur' u.pk %}"
+           class="p-2 rounded-lg hover:bg-orange-100 text-orange-600 transition"
+           title="{% if u.actif %}Désactiver{% else %}Activer{% endif %}">
+            <i data-lucide="{% if u.actif %}user-x{% else %}user-check{% endif %}" class="w-4 h-4"></i>
+        </a>
+        <a href="{% url 'accounts:suppression_utilisateur' u.pk %}"
+           class="p-2 rounded-lg hover:bg-red-100 text-red-600 transition" title="Supprimer">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+        </a>
+        {% endif %}
+    </div>
+</td>
                 </tr>
                 {% endfor %}
             </tbody>

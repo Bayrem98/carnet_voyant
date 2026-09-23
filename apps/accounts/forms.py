@@ -6,20 +6,33 @@ from .models import User
 class UserCreateForm(UserCreationForm):
     class Meta:
         model = User
-        fields = [
-            'username', 'first_name', 'last_name', 'email',
-            'role', 'telephone_pro', 'password1', 'password2',
-        ]
+        fields = ['username', 'role', 'password1', 'password2']
         widgets = {
-            'username': forms.TextInput(attrs={'placeholder': "Nom d'utilisateur"}),
-            'first_name': forms.TextInput(attrs={'placeholder': 'Prénom'}),
-            'last_name': forms.TextInput(attrs={'placeholder': 'Nom'}),
-            'email': forms.EmailInput(attrs={'placeholder': 'email@exemple.com'}),
-            'telephone_pro': forms.TextInput(attrs={'placeholder': '06 12 34 56 78'}),
+            'username': forms.TextInput(attrs={
+                'placeholder': "Nom d'utilisateur",
+                'autocomplete': 'off'
+            }),
         }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        # Labels personnalisés
+        self.fields['username'].label = "Nom d'utilisateur"
+        self.fields['role'].label = "Rôle"
+        self.fields['password1'].label = "Mot de passe"
+        self.fields['password2'].label = "Confirmer le mot de passe"
+        
+        # Placeholders
+        self.fields['password1'].widget.attrs.update({
+            'placeholder': 'Mot de passe',
+            'autocomplete': 'new-password'
+        })
+        self.fields['password2'].widget.attrs.update({
+            'placeholder': 'Confirmer le mot de passe',
+            'autocomplete': 'new-password'
+        })
+        
         for field in self.fields.values():
             field.widget.attrs.setdefault(
                 'class',
@@ -32,13 +45,16 @@ class UserCreateForm(UserCreationForm):
 class UserEditForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = [
-            'username', 'first_name', 'last_name', 'email',
-            'role', 'telephone_pro', 'bio', 'actif',
-        ]
+        fields = ['username', 'role', 'bio', 'actif']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        self.fields['username'].label = "Nom d'utilisateur"
+        self.fields['role'].label = "Rôle"
+        self.fields['bio'].label = "Bio / Notes (optionnel)"
+        self.fields['actif'].label = "Compte actif"
+        
         for field in self.fields.values():
             field.widget.attrs.setdefault(
                 'class',

@@ -5,14 +5,24 @@
 {% block content %}
 <div class="max-w-7xl mx-auto">
 
-    <!-- Fil d'Ariane -->
-    <div class="mb-4 animate-fade-in-up">
-        <div class="flex items-center gap-2 text-sm text-slate-500">
-            <a href="{% url 'carnet:liste_fiches' %}" class="hover:text-purple-600 transition">Mes fiches</a>
-            <i data-lucide="chevron-right" class="w-4 h-4"></i>
-            <span>{{ fiche.nom_complet }}</span>
-        </div>
+    <!-- Fil d'Ariane contextuel -->
+<div class="mb-4 animate-fade-in-up">
+    <div class="flex items-center gap-2 text-sm text-slate-500">
+        {% if from_admin %}
+        <a href="{% url 'accounts:detail_utilisateur' voyant_proprietaire.pk %}" 
+           class="hover:text-purple-600 transition flex items-center gap-1">
+            <i data-lucide="arrow-left" class="w-3 h-3"></i>
+            Retour aux fiches de {{ voyant_proprietaire.nom_complet }}
+        </a>
+        {% else %}
+        <a href="{% url 'carnet:liste_fiches' %}" class="hover:text-purple-600 transition">
+            Mes fiches
+        </a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <span>{{ fiche.nom_complet }}</span>
+        {% endif %}
     </div>
+</div>
 
     <!-- En-tête fiche -->
     <div class="mb-6 animate-fade-in-up">

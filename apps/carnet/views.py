@@ -17,12 +17,11 @@ from apps.accounts.decorators import voyant_required
 @voyant_required
 def liste_fiches(request):
     """Page d'accueil : fiches du voyant connecté, ou toutes si admin."""
+    # Rediriger l'admin vers son espace
     if request.user.is_admin_role():
-        fiches = FicheClient.objects.all().prefetch_related('historiques', 'rendezvous')
-        total = FicheClient.objects.count()
-    else:
-        fiches = FicheClient.objects.filter(voyant=request.user).prefetch_related('historiques', 'rendezvous')
-        total = FicheClient.objects.filter(voyant=request.user).count()
+        return redirect('accounts:gestion_utilisateurs')
+    
+    fiches = FicheClient.objects.filter(voyant=request.user).prefetch_related('historiques', 'rendezvous')
     
     # Recherche
     q = request.GET.get('q', '').strip()
@@ -99,12 +98,14 @@ def detail_fiche(request, pk):
     form_statut = RendezVousStatutForm()
     
     context = {
-    'fiche': fiche,
-    'historiques': historiques,
-    'rendezvous': rendezvous,
-    'form_hist': form_hist,
-    'form_rdv': form_rdv,
-    'form_statut': form_statut,
+        'fiche': fiche,
+        'historiques': historiques,
+        'rendezvous': rendezvous,
+        'form_hist': form_hist,
+        'form_rdv': form_rdv,
+        'form_statut': form_statut,
+        'from_admin': request.user.is_admin_role(),  # ← AJOUT
+        'voyant_proprietaire': fiche.voyant,          # ← AJOUT
     }
     return render(request, 'carnet/detail_fiche.html', context)
 

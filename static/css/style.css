@@ -146,3 +146,12 @@
     font-size: 0.95rem;
     line-height: 1.6;
 }
+
+/* Checkbox plus petite et alignée */
+input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #7c3aed;
+    cursor: pointer;
+    flex-shrink: 0;
+}

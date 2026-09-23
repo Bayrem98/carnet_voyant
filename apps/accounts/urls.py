@@ -10,6 +10,7 @@ urlpatterns = [
     # Gestion des utilisateurs (admin seulement)
     path('utilisateurs/', views.gestion_utilisateurs, name='gestion_utilisateurs'),
     path('utilisateurs/nouveau/', views.creation_utilisateur, name='creation_utilisateur'),
+    path('utilisateurs/<int:pk>/', views.detail_utilisateur, name='detail_utilisateur'),
     path('utilisateurs/<int:pk>/modifier/', views.modification_utilisateur, name='modification_utilisateur'),
     path('utilisateurs/<int:pk>/toggle/', views.toggle_actif_utilisateur, name='toggle_actif_utilisateur'),
     path('utilisateurs/<int:pk>/supprimer/', views.suppression_utilisateur, name='suppression_utilisateur'),

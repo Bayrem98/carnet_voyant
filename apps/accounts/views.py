@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.views import View
-from django.db.models import Q
+from django.db.models import Q, Count
+from datetime import date, timedelta
+from django.utils import timezone
 from .models import User
 from .decorators import admin_required
 from .forms import UserCreateForm, UserEditForm
@@ -11,7 +13,7 @@ from .forms import UserCreateForm, UserEditForm
 class LoginView(View):
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('carnet:liste_fiches')
+            return redirect_by_role(request.user)
         return render(request, 'accounts/login.html')
     
     def post(self, request):
@@ -23,9 +25,19 @@ class LoginView(View):
                 messages.error(request, "Votre compte est désactivé. Contactez l'administrateur.")
                 return render(request, 'accounts/login.html')
             login(request, user)
-            return redirect('carnet:liste_fiches')
+            return redirect_by_role(user)
         messages.error(request, "Identifiants invalides")
         return render(request, 'accounts/login.html')
+
+
+def redirect_by_role(user):
+    """Redirige l'utilisateur vers la bonne page selon son rôle."""
+    if user.is_admin_role():
+        return redirect('accounts:gestion_utilisateurs')
+    elif user.is_responsable():
+        return redirect('accounts:gestion_utilisateurs')  # ou une vue responsable
+    else:
+        return redirect('carnet:liste_fiches')
 
 
 class LogoutView(View):
@@ -40,10 +52,9 @@ class LogoutView(View):
 
 @admin_required
 def gestion_utilisateurs(request):
-    """Liste de tous les utilisateurs (voyants, responsables, admins)."""
+    """Liste de tous les utilisateurs."""
     users = User.objects.all().order_by('role', 'username')
     
-    # Recherche
     q = request.GET.get('q', '').strip()
     if q:
         users = users.filter(
@@ -53,7 +64,6 @@ def gestion_utilisateurs(request):
             Q(email__icontains=q)
         )
     
-    # Filtre par rôle
     role = request.GET.get('role')
     if role:
         users = users.filter(role=role)
@@ -72,7 +82,7 @@ def gestion_utilisateurs(request):
 
 @admin_required
 def creation_utilisateur(request):
-    """Créer un nouvel utilisateur (voyant, responsable ou admin)."""
+    """Créer un nouvel utilisateur."""
     if request.method == 'POST':
         form = UserCreateForm(request.POST)
         if form.is_valid():
@@ -83,6 +93,47 @@ def creation_utilisateur(request):
         form = UserCreateForm()
     
     return render(request, 'accounts/creation_utilisateur.html', {'form': form})
+
+
+@admin_required
+def detail_utilisateur(request, pk):
+    """Vue admin : voir toutes les fiches, rappels, stats d'un utilisateur."""
+    from apps.carnet.models import FicheClient, HistoriqueConsultation, RendezVous
+    
+    user_obj = get_object_or_404(User, pk=pk)
+    
+    fiches = FicheClient.objects.filter(voyant=user_obj).prefetch_related('historiques', 'rendezvous')
+    
+    total_fiches = fiches.count()
+    total_historiques = HistoriqueConsultation.objects.filter(fiche__voyant=user_obj).count()
+    total_rdv = RendezVous.objects.filter(fiche__voyant=user_obj).count()
+    fiches_favorites = fiches.filter(favori=True).count()
+    
+    aujourdhui = date.today()
+    rdv_a_venir = RendezVous.objects.filter(
+        fiche__voyant=user_obj,
+        date_rdv__gte=aujourdhui,
+        statut__in=['planifie', 'confirme']
+    ).select_related('fiche').order_by('date_rdv', 'heure_rdv')[:10]
+    
+    anniversaires = []
+    for fiche in fiches.exclude(date_naissance=None):
+        jours = fiche.anniversaire_dans
+        if jours is not None and jours <= 30:
+            anniversaires.append((fiche, jours))
+    anniversaires.sort(key=lambda x: x[1])
+    
+    context = {
+        'user_obj': user_obj,
+        'fiches': fiches,
+        'total_fiches': total_fiches,
+        'total_historiques': total_historiques,
+        'total_rdv': total_rdv,
+        'fiches_favorites': fiches_favorites,
+        'rdv_a_venir': rdv_a_venir,
+        'anniversaires': anniversaires,
+    }
+    return render(request, 'accounts/detail_utilisateur.html', context)
 
 
 @admin_required
