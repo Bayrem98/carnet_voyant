@@ -121,3 +121,35 @@ class RendezVousStatutForm(forms.ModelForm):
                 'focus:border-purple-400 focus:ring-2 focus:ring-purple-200 '
                 'outline-none transition'
             )
+
+class ReporterRdvForm(forms.Form):
+    """Formulaire pour reporter un RDV (nouvelle date + heure)."""
+    
+    nouvelle_date = forms.DateField(
+        label="Nouvelle date",
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        required=True,
+    )
+    nouvelle_heure = forms.TimeField(
+        label="Nouvelle heure",
+        widget=forms.TimeInput(attrs={'type': 'time'}),
+        required=True,
+    )
+    raison = forms.CharField(
+        label="Raison du report (optionnel)",
+        widget=forms.Textarea(attrs={
+            'rows': 3,
+            'placeholder': 'Ex : Client malade, empêchement, à sa demande...'
+        }),
+        required=False,
+    )
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.setdefault(
+                'class',
+                'w-full px-4 py-2.5 rounded-xl border border-slate-200 '
+                'focus:border-purple-400 focus:ring-2 focus:ring-purple-200 '
+                'outline-none transition'
+            )

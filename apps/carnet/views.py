@@ -10,7 +10,8 @@ from .forms import (
     FicheClientForm, 
     HistoriqueConsultationForm, 
     RendezVousForm,
-    RendezVousStatutForm,
+    RendezVousStatutForm, 
+    ReporterRdvForm,
 )
 from apps.accounts.decorators import voyant_required
 
@@ -332,4 +333,142 @@ def changer_statut_rdv(request, pk):
     return render(request, 'carnet/changer_statut_rdv.html', {
         'rdv': rdv,
         'form': form,
+    })
+
+# ============================================================
+# HISTORIQUE CONSULTATION : Modifier / Supprimer
+# ============================================================
+
+@voyant_required
+def modifier_historique(request, pk):
+    """Modifier une consultation (admin ou voyant propriétaire)."""
+    
+    if request.user.is_admin_role():
+        hist = get_object_or_404(HistoriqueConsultation, pk=pk)
+    else:
+        hist = get_object_or_404(HistoriqueConsultation, pk=pk, fiche__voyant=request.user)
+    
+    if request.method == 'POST':
+        form = HistoriqueConsultationForm(request.POST, instance=hist)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Consultation modifiée")
+            return redirect('carnet:detail_fiche', pk=hist.fiche.pk)
+    else:
+        form = HistoriqueConsultationForm(instance=hist)
+    
+    return render(request, 'carnet/modifier_historique.html', {
+        'form': form,
+        'hist': hist,
+        'fiche': hist.fiche,
+    })
+
+
+@voyant_required
+def supprimer_historique(request, pk):
+    """Supprimer une consultation (admin ou voyant propriétaire)."""
+    
+    if request.user.is_admin_role():
+        hist = get_object_or_404(HistoriqueConsultation, pk=pk)
+    else:
+        hist = get_object_or_404(HistoriqueConsultation, pk=pk, fiche__voyant=request.user)
+    
+    fiche_pk = hist.fiche.pk
+    
+    if request.method == 'POST':
+        hist.delete()
+        messages.success(request, "Consultation supprimée")
+        return redirect('carnet:detail_fiche', pk=fiche_pk)
+    
+    return render(request, 'carnet/supprimer_historique.html', {
+        'hist': hist,
+        'fiche': hist.fiche,
+    })
+
+
+# ============================================================
+# RENDEZ-VOUS : Modifier / Reporter / Supprimer
+# ============================================================
+
+@voyant_required
+def modifier_rdv(request, pk):
+    """Modifier un RDV (admin ou voyant propriétaire)."""
+    
+    if request.user.is_admin_role():
+        rdv = get_object_or_404(RendezVous, pk=pk)
+    else:
+        rdv = get_object_or_404(RendezVous, pk=pk, fiche__voyant=request.user)
+    
+    if request.method == 'POST':
+        form = RendezVousForm(request.POST, instance=rdv)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Rendez-vous modifié")
+            return redirect('carnet:detail_fiche', pk=rdv.fiche.pk)
+    else:
+        form = RendezVousForm(instance=rdv)
+    
+    return render(request, 'carnet/modifier_rdv.html', {
+        'form': form,
+        'rdv': rdv,
+        'fiche': rdv.fiche,
+    })
+
+
+@voyant_required
+def reporter_rdv(request, pk):
+    """Reporter un RDV : demande nouvelle date + heure, garde les notes."""
+    
+    if request.user.is_admin_role():
+        rdv = get_object_or_404(RendezVous, pk=pk)
+    else:
+        rdv = get_object_or_404(RendezVous, pk=pk, fiche__voyant=request.user)
+    
+    if request.method == 'POST':
+        form = ReporterRdvForm(request.POST)
+        if form.is_valid():
+            rdv.date_rdv = form.cleaned_data['nouvelle_date']
+            rdv.heure_rdv = form.cleaned_data['nouvelle_heure']
+            rdv.statut = 'reporte'
+            # Ajouter une note sur le report
+            if form.cleaned_data['raison']:
+                if rdv.notes:
+                    rdv.notes += f"\n[Report du {date.today().strftime('%d/%m/%Y')}] {form.cleaned_data['raison']}"
+                else:
+                    rdv.notes = f"[Report du {date.today().strftime('%d/%m/%Y')}] {form.cleaned_data['raison']}"
+            rdv.save()
+            messages.success(request, f"RDV reporté au {rdv.date_rdv.strftime('%d/%m/%Y')} à {rdv.heure_rdv.strftime('%H:%M')}")
+            return redirect('carnet:detail_fiche', pk=rdv.fiche.pk)
+    else:
+        form = ReporterRdvForm(initial={
+            'nouvelle_date': rdv.date_rdv,
+            'nouvelle_heure': rdv.heure_rdv,
+        })
+    
+    return render(request, 'carnet/reporter_rdv.html', {
+        'form': form,
+        'rdv': rdv,
+        'fiche': rdv.fiche,
+    })
+
+
+@voyant_required
+def supprimer_rdv(request, pk):
+    """Supprimer un RDV (admin ou voyant propriétaire)."""
+    
+    if request.user.is_admin_role():
+        rdv = get_object_or_404(RendezVous, pk=pk)
+    else:
+        rdv = get_object_or_404(RendezVous, pk=pk, fiche__voyant=request.user)
+    
+    fiche_pk = rdv.fiche.pk
+    
+    if request.method == 'POST':
+        rdv.delete()
+        messages.success(request, "Rendez-vous supprimé")
+        return redirect('carnet:detail_fiche', pk=fiche_pk)
+    
+    return render(request, 'carnet/supprimer_rdv.html', {
+        'rdv': rdv,
+        'fiche': rdv.fiche,
     })
