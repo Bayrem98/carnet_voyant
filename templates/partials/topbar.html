@@ -1,13 +1,59 @@
 <header class="bg-white/80 backdrop-blur border-b border-purple-100 px-6 py-4 flex items-center justify-between">
+
     <div>
         <h1 class="text-xl font-bold text-purple-900">{% block page_title %}{% endblock %}</h1>
         <p class="text-sm text-slate-500">{% block page_subtitle %}{% endblock %}</p>
     </div>
-    
-    <div class="flex items-center gap-4">
-        <span class="flex items-center gap-2 text-sm text-slate-600">
+
+    <div class="flex items-center gap-5">
+
+        <!-- Date + Heure -->
+        <div class="text-right">
+            <div class="text-sm font-semibold text-slate-800" id="topbar-date">
+                Chargement...
+            </div>
+            <div class="text-xs text-slate-500 font-mono" id="topbar-time">
+                --:--:--
+            </div>
+        </div>
+
+        <!-- Statut en ligne -->
+        <span class="flex items-center gap-2 text-sm text-slate-600 border-l border-slate-200 pl-5">
             <span class="w-2 h-2 rounded-full bg-green-500 statut-disponible"></span>
             En ligne
         </span>
     </div>
 </header>
+
+<script>
+(function() {
+    const jours = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    const mois = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+                  'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+
+    function updateDateTime() {
+        const now = new Date();
+
+        // Date : "Mercredi 23 septembre 2026"
+        const jourNom = jours[now.getDay()];
+        const jour = now.getDate();
+        const moisNom = mois[now.getMonth()];
+        const annee = now.getFullYear();
+        const dateStr = `${jourNom} ${jour} ${moisNom} ${annee}`;
+
+        // Heure : "18:45:23"
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const s = String(now.getSeconds()).padStart(2, '0');
+        const timeStr = `${h}:${m}:${s}`;
+
+        const dateEl = document.getElementById('topbar-date');
+        const timeEl = document.getElementById('topbar-time');
+        if (dateEl) dateEl.textContent = dateStr;
+        if (timeEl) timeEl.textContent = timeStr;
+    }
+
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+})();
+</script>
