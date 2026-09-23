@@ -4,14 +4,39 @@
 
 {% block content %}
 <div class="max-w-3xl mx-auto animate-fade-in-up">
-    <div class="mb-6">
-        <a href="{% url 'carnet:detail_fiche' fiche.pk %}" class="text-sm text-slate-500 hover:text-purple-600 flex items-center gap-1 mb-3">
+        <div class="mb-6">
+        {% if from_admin %}
+        <a href="{% url 'accounts:detail_utilisateur' voyant_proprietaire.pk %}" 
+           class="text-sm text-slate-500 hover:text-purple-600 flex items-center gap-1 mb-3">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            Retour aux fiches de {{ voyant_proprietaire.nom_complet }}
+        </a>
+        {% else %}
+        <a href="{% url 'carnet:detail_fiche' fiche.pk %}" 
+           class="text-sm text-slate-500 hover:text-purple-600 flex items-center gap-1 mb-3">
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
             Retour à la fiche
         </a>
+        {% endif %}
+        
         <h1 class="text-3xl font-bold text-purple-900">Modifier la fiche</h1>
         <p class="text-slate-500">{{ fiche.nom_complet }}</p>
     </div>
+
+    <!-- Bandeau info admin -->
+    {% if from_admin %}
+    <div class="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3">
+        <i data-lucide="info" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+        <div class="text-sm text-amber-800">
+            <strong>Mode administrateur</strong>
+            <p class="mt-1">
+                Vous modifiez la fiche de <strong>{{ fiche.nom_complet }}</strong>, 
+                appartenant au voyant <strong>{{ voyant_proprietaire.nom_complet }}</strong>.
+                Le voyant verra les modifications immédiatement.
+            </p>
+        </div>
+    </div>
+    {% endif %}
 
     <form method="post" class="glass rounded-3xl p-6 space-y-6">
         {% csrf_token %}

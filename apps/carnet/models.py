@@ -228,6 +228,40 @@ class FicheClient(models.Model):
         if not self.forfait or not self.forfait_minutes_total:
             return 0
         return min(100, round((self.forfait_minutes_utilisees / self.forfait_minutes_total) * 100))
+
+    @property
+    def forfait_alerte_niveau(self):
+        """Retourne le niveau d'alerte du forfait : 'ok', 'warning' (80%), 'danger' (100%)."""
+        if not self.forfait:
+            return 'none'
+        pct = self.forfait_pourcentage_utilise
+        if pct >= 100:
+            return 'danger'
+        elif pct >= 80:
+            return 'warning'
+        return 'ok'
+    
+    @property
+    def forfait_alerte_message(self):
+        """Message d'alerte à afficher."""
+        if not self.forfait:
+            return ''
+        pct = self.forfait_pourcentage_utilise
+        restant = self.forfait_minutes_restantes
+        total = self.forfait_minutes_total
+        
+        if pct >= 100:
+            return (
+                f"⚠️ Forfait épuisé ! {self.nom_complet} a utilisé toutes ses minutes "
+                f"({self.forfait_minutes_utilisees}/{total} min). Proposez-lui un renouvellement."
+            )
+        elif pct >= 80:
+            return (
+                f"🔔 Attention : {self.nom_complet} a utilisé {pct}% de son forfait "
+                f"({self.forfait_minutes_utilisees}/{total} min). "
+                f"Il ne reste que {restant} minutes avant épuisement."
+            )
+        return ''
     
     @property
     def forfait_label(self):

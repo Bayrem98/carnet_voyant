@@ -19,7 +19,15 @@
     </div>
 
     <!-- KPI -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+        <!-- ⚠️ NOUVEAU KPI : Forfaits à surveiller -->
+    <div class="glass rounded-2xl p-5 animate-fade-in-up" style="animation-delay: 0.3s">
+        <div class="flex items-center justify-between mb-2">
+            <i data-lucide="alert-triangle" class="w-7 h-7 text-orange-500"></i>
+            <span class="text-2xl font-bold text-orange-900">{{ forfaits_alerte|length }}</span>
+        </div>
+        <p class="text-slate-600 text-sm">Forfaits à surveiller</p>
+    </div>
         <div class="glass rounded-2xl p-5 animate-fade-in-up">
             <div class="flex items-center justify-between mb-2">
                 <i data-lucide="cake" class="w-7 h-7 text-pink-500"></i>
@@ -44,6 +52,69 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- 🚨 Forfaits à surveiller -->
+<div class="glass rounded-2xl p-6 lg:col-span-2 animate-fade-in-up" style="animation-delay: 0.3s">
+    <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <i data-lucide="alert-triangle" class="w-5 h-5 text-orange-500"></i>
+            Forfaits à surveiller
+        </h2>
+        <span class="text-xs text-slate-400">80% et plus</span>
+    </div>
+
+    {% if forfaits_alerte %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {% for fiche in forfaits_alerte %}
+        <a href="{% url 'carnet:detail_fiche' fiche.pk %}"
+           class="p-4 rounded-xl bg-white border-l-4 hover:shadow-md transition
+               {% if fiche.forfait_alerte_niveau == 'danger' %}border-red-500
+               {% else %}border-orange-400{% endif %}">
+            <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-2">
+                    <div class="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs"
+                         style="background: linear-gradient(135deg, {{ fiche.couleur_sexe }}, {{ fiche.couleur_sexe }}cc);">
+                        {{ fiche.nom|first|upper }}
+                    </div>
+                    <div>
+                        <div class="font-semibold text-slate-800 text-sm">{{ fiche.nom_complet }}</div>
+                        <div class="text-xs text-slate-400">{{ fiche.forfait_label }}</div>
+                    </div>
+                </div>
+                {% if fiche.forfait_alerte_niveau == 'danger' %}
+                <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700 whitespace-nowrap">
+                    🚨 Épuisé
+                </span>
+                {% else %}
+                <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-700 whitespace-nowrap">
+                    ⚠️ {{ fiche.forfait_pourcentage_utilise }}%
+                </span>
+                {% endif %}
+            </div>
+            <div class="flex justify-between text-xs text-slate-600 mb-1">
+                <span>{{ fiche.forfait_minutes_utilisees }} / {{ fiche.forfait_minutes_total }} min</span>
+                <span class="font-semibold
+                    {% if fiche.forfait_alerte_niveau == 'danger' %}text-red-600{% else %}text-orange-600{% endif %}">
+                    {{ fiche.forfait_minutes_restantes }} min restantes
+                </span>
+            </div>
+            <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full rounded-full"
+                     style="width: {{ fiche.forfait_pourcentage_utilise }}%;
+                            background: {% if fiche.forfait_alerte_niveau == 'danger' %}#dc2626{% else %}linear-gradient(to right, #f59e0b, #dc2626){% endif %};">
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-8">
+        <i data-lucide="check-circle-2" class="w-10 h-10 text-green-300 mx-auto mb-2"></i>
+        <p class="text-slate-500 text-sm">Aucun forfait à surveiller</p>
+        <p class="text-xs text-slate-400">Tous les forfaits sont en dessous de 80%</p>
+    </div>
+    {% endif %}
+</div>
 
         <!-- 🎂 Anniversaires -->
         <div class="glass rounded-2xl p-6 animate-fade-in-up" style="animation-delay: 0.15s">

@@ -106,6 +106,11 @@ def detail_fiche(request, pk):
         'form_statut': form_statut,
         'from_admin': request.user.is_admin_role(),  # ← AJOUT
         'voyant_proprietaire': fiche.voyant,          # ← AJOUT
+        'forfait_alerte': fiche.forfait_alerte_niveau,
+    'forfait_message': fiche.forfait_alerte_message,
+    'forfait_pct': fiche.forfait_pourcentage_utilise,
+    'forfait_minutes_restantes': fiche.forfait_minutes_restantes,
+    'forfait_minutes_total': fiche.forfait_minutes_total,
     }
     return render(request, 'carnet/detail_fiche.html', context)
 
@@ -203,11 +208,19 @@ def rappels(request):
     # Fiches inactives
     limite = timezone.now() - timedelta(days=60)
     inactifs = fiches.filter(modifie_le__lt=limite)[:10]
+
+        # Clients avec forfait presque épuisé
+    forfaits_alerte = []
+    for fiche in fiches.exclude(forfait=''):
+        if fiche.forfait_alerte_niveau in ['warning', 'danger']:
+            forfaits_alerte.append(fiche)
+    forfaits_alerte.sort(key=lambda f: -f.forfait_pourcentage_utilise)
     
     context = {
         'anniversaires': anniversaires,
         'rdv_a_venir': rdv_a_venir,
         'inactifs': inactifs,
+        'forfaits_alerte': forfaits_alerte,
     }
     return render(request, 'carnet/rappels.html', context)
 
