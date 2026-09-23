@@ -52,9 +52,12 @@ class LogoutView(View):
 
 @admin_required
 def gestion_utilisateurs(request):
-    """Liste de tous les utilisateurs."""
-    users = User.objects.all().order_by('role', 'username')
+    """Liste des voyants et responsables (exclut les admins)."""
     
+    # Base : seulement les voyants et responsables
+    users = User.objects.exclude(role='admin').order_by('role', 'username')
+    
+    # Recherche
     q = request.GET.get('q', '').strip()
     if q:
         users = users.filter(
@@ -64,18 +67,18 @@ def gestion_utilisateurs(request):
             Q(email__icontains=q)
         )
     
+    # Filtre par rôle
     role = request.GET.get('role')
-    if role:
+    if role and role in ['voyant', 'responsable']:
         users = users.filter(role=role)
     
     context = {
         'users': users,
         'q': q,
         'role_actif': role,
-        'total': User.objects.count(),
+        'total': User.objects.exclude(role='admin').count(),
         'nb_voyants': User.objects.filter(role='voyant').count(),
         'nb_responsables': User.objects.filter(role='responsable').count(),
-        'nb_admins': User.objects.filter(role='admin').count(),
     }
     return render(request, 'accounts/gestion_utilisateurs.html', context)
 
@@ -101,6 +104,11 @@ def detail_utilisateur(request, pk):
     from apps.carnet.models import FicheClient, HistoriqueConsultation, RendezVous
     
     user_obj = get_object_or_404(User, pk=pk)
+    
+    # ⚠️ Ne pas montrer les détails d'un admin
+    if user_obj.role == 'admin':
+        messages.error(request, "Vous ne pouvez pas voir les détails d'un administrateur.")
+        return redirect('accounts:gestion_utilisateurs')
     
     fiches = FicheClient.objects.filter(voyant=user_obj).prefetch_related('historiques', 'rendezvous')
     

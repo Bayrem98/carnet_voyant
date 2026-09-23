@@ -27,7 +27,12 @@
             </p>
         </div>
 
-        <form method="post" class="flex items-center justify-center gap-3">
+        <form method="post" 
+      data-confirm="Cette action supprimera définitivement l'utilisateur {{ user_obj.username }} et toutes ses fiches clients."
+      data-confirm-title="Confirmer la suppression ?"
+      data-confirm-type="danger"
+      data-confirm-ok="Supprimer définitivement"
+      class="flex items-center justify-center gap-3">
             {% csrf_token %}
             <a href="{% url 'accounts:gestion_utilisateurs' %}" class="btn btn-ghost">Annuler</a>
             <button type="submit" class="btn bg-red-500 text-white hover:bg-red-600">
