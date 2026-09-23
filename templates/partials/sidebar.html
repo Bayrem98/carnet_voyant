@@ -11,34 +11,78 @@
             </div>
         </a>
     </div>
-    
+
     <!-- Navigation -->
-    <nav class="flex-1 p-4 space-y-1">
-        <a href="{% url 'carnet:liste_fiches' %}" 
+    <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+
+        {% if user.is_voyant or user.is_superuser %}
+        <!-- Menu VOYANT -->
+        <div class="px-3 pt-2 pb-1 text-xs font-semibold text-slate-400 uppercase tracking-wide">
+            Carnet
+        </div>
+        <a href="{% url 'carnet:liste_fiches' %}"
            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 group">
             <i data-lucide="book" class="w-5 h-5 group-hover:scale-110 transition"></i>
             <span class="font-medium">Mes fiches</span>
         </a>
-        
-        <a href="{% url 'carnet:creation_fiche' %}" 
+        <a href="{% url 'carnet:creation_fiche' %}"
            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 group">
             <i data-lucide="plus-circle" class="w-5 h-5 group-hover:scale-110 transition"></i>
             <span class="font-medium">Nouvelle fiche</span>
         </a>
-        
-        <a href="{% url 'carnet:rappels' %}" 
+        <a href="{% url 'carnet:rappels' %}"
            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 group">
             <i data-lucide="bell" class="w-5 h-5 group-hover:scale-110 transition"></i>
             <span class="font-medium">Rappels</span>
         </a>
-        
-        <a href="{% url 'carnet:statistiques' %}" 
+        <a href="{% url 'carnet:statistiques' %}"
            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 group">
             <i data-lucide="bar-chart-3" class="w-5 h-5 group-hover:scale-110 transition"></i>
-            <span class="font-medium">Statistiques</span>
+            <span class="font-medium">Mes statistiques</span>
         </a>
+        {% endif %}
+
+        {% if user.is_admin_role %}
+        <!-- Menu ADMIN -->
+        <div class="px-3 pt-4 pb-1 text-xs font-semibold text-slate-400 uppercase tracking-wide">
+            Administration
+        </div>
+        <a href="{% url 'accounts:gestion_utilisateurs' %}"
+           class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 group">
+            <i data-lucide="users" class="w-5 h-5 group-hover:scale-110 transition"></i>
+            <span class="font-medium">Utilisateurs</span>
+        </a>
+        <a href="{% url 'accounts:creation_utilisateur' %}"
+           class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 group">
+            <i data-lucide="user-plus" class="w-5 h-5 group-hover:scale-110 transition"></i>
+            <span class="font-medium">Nouvel utilisateur</span>
+        </a>
+        <a href="/admin/"
+           class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 group">
+            <i data-lucide="settings" class="w-5 h-5 group-hover:scale-110 transition"></i>
+            <span class="font-medium">Django Admin</span>
+        </a>
+        {% endif %}
+
+        {% if user.is_responsable and not user.is_admin_role %}
+        <!-- Menu RESPONSABLE -->
+        <div class="px-3 pt-2 pb-1 text-xs font-semibold text-slate-400 uppercase tracking-wide">
+            Supervision
+        </div>
+        <a href="#"
+           class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 group">
+            <i data-lucide="activity" class="w-5 h-5 group-hover:scale-110 transition"></i>
+            <span class="font-medium">Vue temps réel</span>
+        </a>
+        <a href="#"
+           class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 group">
+            <i data-lucide="users-2" class="w-5 h-5 group-hover:scale-110 transition"></i>
+            <span class="font-medium">Mes voyants</span>
+        </a>
+        {% endif %}
+
     </nav>
-    
+
     <!-- Profil -->
     <div class="p-4 border-t border-purple-100">
         <div class="flex items-center gap-3 p-3 rounded-xl bg-purple-50">
@@ -47,10 +91,19 @@
             </div>
             <div class="flex-1 min-w-0">
                 <div class="font-medium text-sm text-purple-900 truncate">
-                    {{ user.get_full_name|default:user.username }}
+                    {{ user.nom_complet }}
                 </div>
-                <div class="text-xs text-slate-500">
-                    {{ user.get_role_display }}
+                <div class="text-xs text-slate-500 flex items-center gap-1">
+                    {% if user.is_admin_role %}
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                    Administrateur
+                    {% elif user.is_responsable %}
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                    Responsable
+                    {% else %}
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    Voyant
+                    {% endif %}
                 </div>
             </div>
             <a href="{% url 'accounts:logout' %}" class="text-slate-400 hover:text-red-500 transition">

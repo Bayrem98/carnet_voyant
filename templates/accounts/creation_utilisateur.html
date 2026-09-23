@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Nouvel utilisateur{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto animate-fade-in-up">
+    <div class="mb-6">
+        <a href="{% url 'accounts:gestion_utilisateurs' %}" class="text-sm text-slate-500 hover:text-purple-600 flex items-center gap-1 mb-3">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            Retour
+        </a>
+        <h1 class="text-3xl font-bold text-purple-900">Nouvel utilisateur</h1>
+        <p class="text-slate-500">Créer un voyant, un responsable ou un admin</p>
+    </div>
+
+    <form method="post" class="glass rounded-3xl p-6 space-y-5">
+        {% csrf_token %}
+
+        {% if form.errors %}
+        <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+            <strong>Erreurs :</strong>
+            <ul class="list-disc ml-5 mt-1">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}<li>{{ field }} : {{ error }}</li>{% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-600 mb-1.5">Nom d'utilisateur *</label>
+                {{ form.username }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-600 mb-1.5">Rôle *</label>
+                {{ form.role }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-600 mb-1.5">Prénom</label>
+                {{ form.first_name }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-600 mb-1.5">Nom</label>
+                {{ form.last_name }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-600 mb-1.5">Email</label>
+                {{ form.email }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-600 mb-1.5">Téléphone pro</label>
+                {{ form.telephone_pro }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-600 mb-1.5">Mot de passe *</label>
+                {{ form.password1 }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-600 mb-1.5">Confirmer *</label>
+                {{ form.password2 }}
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+            <a href="{% url 'accounts:gestion_utilisateurs' %}" class="btn btn-ghost">Annuler</a>
+            <button type="submit" class="btn btn-primary">
+                <i data-lucide="user-plus" class="w-5 h-5"></i>
+                Créer l'utilisateur
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

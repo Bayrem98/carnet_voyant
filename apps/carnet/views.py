@@ -12,12 +12,17 @@ from .forms import (
     RendezVousForm,
     RendezVousStatutForm,
 )
+from apps.accounts.decorators import voyant_required
 
-
-@login_required
+@voyant_required
 def liste_fiches(request):
-    """Page d'accueil : toutes les fiches du voyant connecté"""
-    fiches = FicheClient.objects.filter(voyant=request.user).prefetch_related('historiques', 'rendezvous')
+    """Page d'accueil : fiches du voyant connecté, ou toutes si admin."""
+    if request.user.is_admin_role():
+        fiches = FicheClient.objects.all().prefetch_related('historiques', 'rendezvous')
+        total = FicheClient.objects.count()
+    else:
+        fiches = FicheClient.objects.filter(voyant=request.user).prefetch_related('historiques', 'rendezvous')
+        total = FicheClient.objects.filter(voyant=request.user).count()
     
     # Recherche
     q = request.GET.get('q', '').strip()
@@ -55,10 +60,14 @@ def liste_fiches(request):
     return render(request, 'carnet/liste_fiches.html', context)
 
 
-@login_required
+@voyant_required
 def detail_fiche(request, pk):
     """Vue détaillée d'une fiche client"""
-    fiche = get_object_or_404(FicheClient, pk=pk, voyant=request.user)
+    if request.user.is_admin_role():
+        fiche = get_object_or_404(FicheClient, pk=pk)
+    else:
+        fiche = get_object_or_404(FicheClient, pk=pk, voyant=request.user)
+
     historiques = fiche.historiques.all()
     rendezvous = fiche.rendezvous.all()
     
@@ -100,7 +109,7 @@ def detail_fiche(request, pk):
     return render(request, 'carnet/detail_fiche.html', context)
 
 
-@login_required
+@voyant_required
 def creation_fiche(request):
     if request.method == 'POST':
         form = FicheClientForm(request.POST)
@@ -116,7 +125,7 @@ def creation_fiche(request):
     return render(request, 'carnet/creation_fiche.html', {'form': form})
 
 
-@login_required
+@voyant_required
 def modification_fiche(request, pk):
     fiche = get_object_or_404(FicheClient, pk=pk, voyant=request.user)
     
@@ -132,7 +141,7 @@ def modification_fiche(request, pk):
     return render(request, 'carnet/modification_fiche.html', {'form': form, 'fiche': fiche})
 
 
-@login_required
+@voyant_required
 def suppression_fiche(request, pk):
     fiche = get_object_or_404(FicheClient, pk=pk, voyant=request.user)
     if request.method == 'POST':
@@ -143,7 +152,7 @@ def suppression_fiche(request, pk):
     return render(request, 'carnet/suppression_fiche.html', {'fiche': fiche})
 
 
-@login_required
+@voyant_required
 def toggle_favori(request, pk):
     fiche = get_object_or_404(FicheClient, pk=pk, voyant=request.user)
     fiche.favori = not fiche.favori
@@ -151,7 +160,7 @@ def toggle_favori(request, pk):
     return JsonResponse({'favori': fiche.favori})
 
 
-@login_required
+@voyant_required
 def recherche_ajax(request):
     """Recherche instantanée en AJAX"""
     q = request.GET.get('q', '').strip()
@@ -168,7 +177,7 @@ def recherche_ajax(request):
     return render(request, 'carnet/partials/grille_fiches.html', {'fiches': fiches})
 
 
-@login_required
+@voyant_required
 def rappels(request):
     """Rappels : anniversaires, RDV à venir, clients inactifs"""
     aujourdhui = date.today()
@@ -202,7 +211,7 @@ def rappels(request):
     return render(request, 'carnet/rappels.html', context)
 
 
-@login_required
+@voyant_required
 def statistiques(request):
     fiches = FicheClient.objects.filter(voyant=request.user)
     
@@ -273,7 +282,7 @@ def statistiques(request):
     }
     return render(request, 'carnet/statistiques.html', context)
 
-@login_required
+@voyant_required
 def changer_statut_rdv(request, pk):
     """Change le statut d'un RDV après qu'il soit passé."""
     rdv = get_object_or_404(
