@@ -133,7 +133,12 @@ def creation_fiche(request):
 
 @voyant_required
 def modification_fiche(request, pk):
-    fiche = get_object_or_404(FicheClient, pk=pk, voyant=request.user)
+    """Modifier une fiche (admin ou voyant propriétaire)."""
+    
+    if request.user.is_admin_role():
+        fiche = get_object_or_404(FicheClient, pk=pk)
+    else:
+        fiche = get_object_or_404(FicheClient, pk=pk, voyant=request.user)
     
     if request.method == 'POST':
         form = FicheClientForm(request.POST, instance=fiche)
@@ -149,7 +154,13 @@ def modification_fiche(request, pk):
 
 @voyant_required
 def suppression_fiche(request, pk):
-    fiche = get_object_or_404(FicheClient, pk=pk, voyant=request.user)
+    """Supprimer une fiche (admin ou voyant propriétaire)."""
+    
+    if request.user.is_admin_role():
+        fiche = get_object_or_404(FicheClient, pk=pk)
+    else:
+        fiche = get_object_or_404(FicheClient, pk=pk, voyant=request.user)
+    
     if request.method == 'POST':
         nom = fiche.nom_complet
         fiche.delete()
