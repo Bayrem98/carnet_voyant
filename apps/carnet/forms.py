@@ -5,22 +5,26 @@ from .models import FicheClient, HistoriqueConsultation, RendezVous
 class FicheClientForm(forms.ModelForm):
     """Formulaire de création/modification d'une fiche client."""
     
+    # ✅ Forcer le format ISO pour la date (compatible <input type="date">)
+    date_naissance = forms.DateField(
+        required=False,
+        widget=forms.DateInput(
+            attrs={'type': 'date'},
+            format='%Y-%m-%d'  # ← Format HTML5
+        ),
+        input_formats=['%Y-%m-%d', '%d/%m/%Y', '%d-%m-%Y'],  # ← Accepte plusieurs formats
+    )
+    
     class Meta:
         model = FicheClient
         fields = [
-            # Identité
             'nom', 'sexe',
-            # Naissance
             'date_naissance', 'lieu_naissance',
-            # Vie personnelle
             'situation_familiale', 'profession', 'nombre_enfants',
-            # Forfait
             'forfait', 'forfait_minutes_utilisees',
-            # Description
             'description_generale',
         ]
         widgets = {
-            'date_naissance': forms.DateInput(attrs={'type': 'date'}),
             'description_generale': forms.Textarea(attrs={
                 'rows': 4,
                 'placeholder': 'Qui est ce client ? Son caractère, son histoire...'
@@ -34,6 +38,10 @@ class FicheClientForm(forms.ModelForm):
         self.fields['nom'].required = True
         self.fields['nom'].label = "Nom du client *"
         
+        # ✅ S'assurer que la date initiale est bien au format ISO
+        if self.instance and self.instance.pk and self.instance.date_naissance:
+            self.initial['date_naissance'] = self.instance.date_naissance.strftime('%Y-%m-%d')
+        
         for field in self.fields.values():
             field.widget.attrs.setdefault(
                 'class',
@@ -44,6 +52,13 @@ class FicheClientForm(forms.ModelForm):
 
 
 class HistoriqueConsultationForm(forms.ModelForm):
+    # ✅ Forcer le format ISO
+    date_consultation = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
+        input_formats=['%Y-%m-%d', '%d/%m/%Y'],
+    )
+    
     class Meta:
         model = HistoriqueConsultation
         fields = [
@@ -52,7 +67,6 @@ class HistoriqueConsultationForm(forms.ModelForm):
             'duree_minutes',
         ]
         widgets = {
-            'date_consultation': forms.DateInput(attrs={'type': 'date'}),
             'notes_generales': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Résumé général...'}),
             'sujet_sentimental': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Amour, sentiments, famille...'}),
             'sujet_professionnel': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Travail, carrière, projets...'}),
@@ -62,6 +76,11 @@ class HistoriqueConsultationForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        # ✅ Forcer le format initial
+        if self.instance and self.instance.pk and self.instance.date_consultation:
+            self.initial['date_consultation'] = self.instance.date_consultation.strftime('%Y-%m-%d')
+        
         for field in self.fields.values():
             field.widget.attrs.setdefault(
                 'class',
@@ -72,14 +91,22 @@ class HistoriqueConsultationForm(forms.ModelForm):
 
 
 class RendezVousForm(forms.ModelForm):
+    # ✅ Forcer le format ISO pour les dates
+    date_rdv = forms.DateField(
+        required=True,
+        widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
+        input_formats=['%Y-%m-%d', '%d/%m/%Y'],
+    )
+    heure_rdv = forms.TimeField(
+        required=True,
+        widget=forms.TimeInput(attrs={'type': 'time'}, format='%H:%M'),
+        input_formats=['%H:%M', '%H:%M:%S'],
+    )
+    
     class Meta:
         model = RendezVous
-        fields = [
-            'date_rdv', 'heure_rdv', 'statut', 'sujet_prevu',
-        ]
+        fields = ['date_rdv', 'heure_rdv', 'statut', 'sujet_prevu']
         widgets = {
-            'date_rdv': forms.DateInput(attrs={'type': 'date'}),
-            'heure_rdv': forms.TimeInput(attrs={'type': 'time'}),
             'sujet_prevu': forms.Textarea(attrs={
                 'rows': 2,
                 'placeholder': 'De quoi allez-vous parler ?'
@@ -88,6 +115,14 @@ class RendezVousForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        # ✅ Forcer le format initial
+        if self.instance and self.instance.pk:
+            if self.instance.date_rdv:
+                self.initial['date_rdv'] = self.instance.date_rdv.strftime('%Y-%m-%d')
+            if self.instance.heure_rdv:
+                self.initial['heure_rdv'] = self.instance.heure_rdv.strftime('%H:%M')
+        
         for field in self.fields.values():
             field.widget.attrs.setdefault(
                 'class',
@@ -127,12 +162,14 @@ class ReporterRdvForm(forms.Form):
     
     nouvelle_date = forms.DateField(
         label="Nouvelle date",
-        widget=forms.DateInput(attrs={'type': 'date'}),
+        widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
+        input_formats=['%Y-%m-%d', '%d/%m/%Y'],
         required=True,
     )
     nouvelle_heure = forms.TimeField(
         label="Nouvelle heure",
-        widget=forms.TimeInput(attrs={'type': 'time'}),
+        widget=forms.TimeInput(attrs={'type': 'time'}, format='%H:%M'),
+        input_formats=['%H:%M', '%H:%M:%S'],
         required=True,
     )
     raison = forms.CharField(

@@ -165,3 +165,6 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000  # 1 an
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
+# Forcer l'utilisation du format ISO pour les dates dans les formulaires
+USE_L10N = False
